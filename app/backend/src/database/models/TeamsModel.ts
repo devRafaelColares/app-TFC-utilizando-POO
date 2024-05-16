@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import db from '.';
-import ITeams from '../../Interfaces/ITeams';
+import ITeams from '../../Interfaces/Teams/ITeams';
 
 type TeamCreationAttributes = Optional<ITeams, 'id'>;
 
