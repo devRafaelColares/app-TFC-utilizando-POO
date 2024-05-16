@@ -8,7 +8,8 @@ import Example from '../database/models/ExampleModel';
 import TeamModel from '../models/Team.model';
 
 import { Response } from 'superagent';
-import { arrayTeams } from './mock/tems.mock';
+import teamsMocks from './mock/teams.mock';
+import Teams from '../database/models/TeamsModel';
 
 chai.use(chaiHttp);
 
@@ -49,13 +50,40 @@ describe('Seu teste', () => {
     sinon.restore();
   });
   
-  it('should return all teams', async function() {
-    sinon.stub(TeamModel.prototype, 'findAll').resolves(arrayTeams); // Substituir SequelizeBook por TeamsModel e ajustar o método de stub
+  it('Verifica se retorna todos os times', async function() {
+    sinon.stub(TeamModel.prototype, 'findAll').resolves(teamsMocks.arrayTeams);
 
-    const { status, body } = await chai.request(app).get('/teams'); // Corrigir a rota para a rota de Teams
+    const { status, body } = await chai.request(app).get('/teams');
 
     expect(status).to.equal(200);
-    expect(body).to.deep.equal(arrayTeams);
+    expect(body).to.deep.equal(teamsMocks.arrayTeams);
+  });
+
+  it('Verifica se retorna todos os times', async function() {
+    sinon.stub(Teams, 'findAll').resolves(teamsMocks.arrayTeams as any);
+
+    const { status, body } = await chai.request(app).get('/teams');
+
+    expect(status).to.equal(200);
+    expect(body).to.deep.equal(teamsMocks.arrayTeams);
+  });
+
+  it('Verifica se retorna um time ao buscar por id', async function() {
+    sinon.stub(Teams, 'findOne').resolves(teamsMocks.teamById as any);
+
+    const { status, body } = await chai.request(app).get('/teams/5');
+
+    expect(status).to.equal(200);
+    expect(body).to.deep.equal(teamsMocks.teamById);
+  });
+
+  it('Verifica se retorna not found se o time não existir', async function() {
+    sinon.stub(Teams, 'findOne').resolves(null);
+
+    const { status, body } = await chai.request(app).get('/teams/5');
+
+    expect(status).to.equal(404);
+    expect(body.message).to.equal('Team 5 not found');
   });
 
 });

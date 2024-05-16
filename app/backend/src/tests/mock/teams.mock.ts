@@ -1,4 +1,4 @@
-export const arrayTeams = [
+const arrayTeams = [
     {
       "id": 1,
       "teamName": "Avaí/Kindermann"
@@ -64,3 +64,13 @@ export const arrayTeams = [
       "teamName": "São Paulo"
     }
   ]
+
+  const teamById = {
+    "id": 5,
+    "teamName": "Cruzeiro"
+  }
+
+  export default {
+    arrayTeams,
+    teamById,
+  }
