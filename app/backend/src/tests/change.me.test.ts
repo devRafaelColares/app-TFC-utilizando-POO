@@ -103,7 +103,7 @@ describe('POST /login', function () {
 
     const httpResponse = await chai.request(app).post('/login').send(httpRequestBody)
 
-    expect(httpResponse.status).to.be.equal(200)
+    expect(httpResponse.status).to.be.equal(200);
   });
 
   it('Verifica se alguma falha na conexão com o banco de dados retornará 500', async function() {
@@ -140,11 +140,30 @@ describe('POST /login', function () {
     expect(httpResponse.status).to.be.equal(400);
   });
 
-  it('Verifica se é possível fazer login sem dados validos', async function() {
+  it('Verifica se é possível fazer login com dados inválidos', async function() {
     const httpRequestBody = userMock.noValidUser;
 
     const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
 
-    expect(httpResponse.status).to.be.equal(500);
+    expect(httpResponse.status).to.be.equal(401);
+    expect(httpResponse.body.message).to.be.equal('Invalid email or password');
+  });
+
+  it('Verifica se é possível fazer login com email inválido', async function() {
+    const httpRequestBody = userMock.invalidEmailUser;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(401);
+    expect(httpResponse.body.message).to.be.equal('Invalid email or password');
+  });
+
+  it('Verifica se é possível fazer login com senha inválida', async function() {
+    const httpRequestBody = userMock.invalidPasswordUser;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(401);
+    expect(httpResponse.body.message).to.be.equal('Invalid email or password');
   });
 });
