@@ -10,6 +10,10 @@ import TeamModel from '../models/Team.model';
 import { Response } from 'superagent';
 import teamsMocks from './mock/teams.mock';
 import Teams from '../database/models/TeamsModel';
+import User from '../database/models/UserModel';
+import LoginController from '../controllers/Login.controller';
+import userMock from './mock/user.mock';
+import LoginService from '../services/Login.service';
 
 chai.use(chaiHttp);
 
@@ -46,6 +50,8 @@ describe('Seu teste', () => {
   //   expect(false).to.be.eq(true);
   // });
 
+
+  describe('Testes para rota teams', () => {
   afterEach(function() {
     sinon.restore();
   });
@@ -86,4 +92,59 @@ describe('Seu teste', () => {
     expect(body.message).to.equal('Team 5 not found');
   });
 
+ });
+});
+
+describe('POST /login', function () {
+  beforeEach(function () { sinon.restore(); });
+  
+  it('Verifica se é possível fazer login', async function() {
+    const httpRequestBody = userMock.validUser;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody)
+
+    expect(httpResponse.status).to.be.equal(200)
+  });
+
+  it('Verifica se alguma falha na conexão com o banco de dados retornará 500', async function() {
+    const httpRequestBody = userMock.validUser
+
+    sinon.stub(LoginService.prototype, 'login').resolves(undefined)
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(500);
+  });
+
+  it('Verifica se é possível fazer login sem um email', async function() {
+    const httpRequestBody = userMock.userWithoutEmail;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(400);
+  });
+
+  it('Verifica se é possível fazer login sem um password', async function() {
+    const httpRequestBody = userMock.userWithoutPassword;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(400);
+  });
+
+  it('Verifica se é possível fazer login sem inserir os dados', async function() {
+    const httpRequestBody = userMock.userWithoutData;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(400);
+  });
+
+  it('Verifica se é possível fazer login sem dados validos', async function() {
+    const httpRequestBody = userMock.noValidUser;
+
+    const httpResponse = await chai.request(app).post('/login').send(httpRequestBody);
+
+    expect(httpResponse.status).to.be.equal(500);
+  });
 });
