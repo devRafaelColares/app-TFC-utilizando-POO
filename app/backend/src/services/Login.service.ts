@@ -29,7 +29,7 @@ export default class LoginService {
       return { status: 'INVALID_DATA', data: { message: INVALID_DATA_MSG } };
     }
 
-    const token = JwtUtils.sign({ id: user.id, role: user.role });
+    const token = JwtUtils.sign({ id: user.id, email: user.email });
     return { status: 'SUCCESSFUL', data: { token } };
   }
 }

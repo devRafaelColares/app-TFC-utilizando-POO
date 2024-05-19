@@ -4,15 +4,18 @@ const secret = process.env.JWT_SECRET || 'secret';
 
 export type TokenPayload = {
   id: number,
-  role: string,
+  email: string,
 };
 
 export default class JwtUtils {
   static sign(payload: TokenPayload): string {
-    return jwt.sign(payload, secret);
+    const { id, email } = payload;
+    return jwt.sign({ id, email }, secret);
   }
 
   static verify(token: string): TokenPayload {
-    return jwt.verify(token, secret) as TokenPayload;
+    const decoded = jwt.verify(token, secret) as TokenPayload;
+    const { id, email } = decoded;
+    return { id, email };
   }
 }
