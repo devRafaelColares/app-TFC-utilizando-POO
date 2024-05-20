@@ -23,4 +23,20 @@ export default class MatchesController {
     }
     res.status(200).json(matchesResponse.data);
   }
+
+  public async getMatcheForFinish(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const finishResponse = await this.matchesService.getAndFinishMatche(Number(id));
+
+      if (finishResponse.status === 'SUCCESSFUL') {
+        return res.status(200).json({ message: 'Finished' });
+      }
+      return res.status(mapStatusHTTP(finishResponse.status)).json(finishResponse.data);
+    } catch (error) {
+      console.error('Erro ao finalizar a partida:', error);
+      return res.status(500).json({ message: 'Erro ao finalizar a partida' });
+    }
+  }
 }

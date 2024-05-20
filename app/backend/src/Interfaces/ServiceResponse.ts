@@ -13,4 +13,5 @@ export type ServiceResponseSuccess<T> = {
   data: T
 };
 
-export type ServiceResponse<T> = ServiceResponseError | ServiceResponseSuccess<T>;
+export type ServiceResponse<T> =
+ServiceResponseError | ServiceResponseSuccess<T>;

@@ -1,4 +1,4 @@
-import { ServiceResponse } from '../Interfaces/ServiceResponse';
+import { ServiceMessage, ServiceResponse } from '../Interfaces/ServiceResponse';
 import { IMatchesModel } from '../Interfaces/Matches/IMatchesModel';
 import MatchesModel from '../models/Matches.model';
 import { MatchWithTeams } from '../Interfaces/Matches/IMatches';
@@ -31,5 +31,13 @@ export default class MatchesService {
     const filteredMatches = await this.matchesModel.findAllBoolean(inProgress);
     const matchesWithTeams = MatchesService.mapToMatchWithTeams(filteredMatches);
     return { status: 'SUCCESSFUL', data: matchesWithTeams };
+  }
+
+  public async getAndFinishMatche(id: number): Promise<ServiceResponse<ServiceMessage>> {
+    const isSuccess = await this.matchesModel.finishMatch(id);
+    if (isSuccess) {
+      return { status: 'SUCCESSFUL', data: { message: 'Finished' } };
+    }
+    return { status: 'NOT_FOUND', data: { message: 'Partida não encontrada' } };
   }
 }
