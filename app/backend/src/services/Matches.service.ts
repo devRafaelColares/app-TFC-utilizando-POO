@@ -8,9 +8,8 @@ export default class MatchesService {
     private matchesModel: IMatchesModel = new MatchesModel(),
   ) {}
 
-  public async getAllMatches(): Promise<ServiceResponse<MatchWithTeams[]>> {
-    const allMatches = await this.matchesModel.findAll();
-    const matchesWithTeams: MatchWithTeams[] = allMatches.map((match) => ({
+  private static mapToMatchWithTeams(matches: any[]): MatchWithTeams[] {
+    return matches.map((match) => ({
       id: match.id,
       homeTeamId: match.homeTeamId,
       homeTeamGoals: match.homeTeamGoals,
@@ -20,6 +19,17 @@ export default class MatchesService {
       homeTeam: match.homeTeam,
       awayTeam: match.awayTeam,
     }));
+  }
+
+  public async getAllMatches(): Promise<ServiceResponse<MatchWithTeams[]>> {
+    const allMatches = await this.matchesModel.findAll();
+    const matchesWithTeams = MatchesService.mapToMatchWithTeams(allMatches);
+    return { status: 'SUCCESSFUL', data: matchesWithTeams };
+  }
+
+  public async getMatchesByStatus(inProgress: boolean): Promise<ServiceResponse<MatchWithTeams[]>> {
+    const filteredMatches = await this.matchesModel.findAllBoolean(inProgress);
+    const matchesWithTeams = MatchesService.mapToMatchWithTeams(filteredMatches);
     return { status: 'SUCCESSFUL', data: matchesWithTeams };
   }
 }

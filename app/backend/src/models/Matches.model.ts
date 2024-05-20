@@ -6,14 +6,7 @@ import { IMatchesModel } from '../Interfaces/Matches/IMatchesModel';
 export default class MatchesModel implements IMatchesModel {
   private model = Matches;
 
-  async findAll(): Promise<MatchWithTeams[]> {
-    const dbData = await this.model.findAll({
-      include: [
-        { model: Teams, as: 'homeTeam', attributes: ['teamName'] },
-        { model: Teams, as: 'awayTeam', attributes: ['teamName'] },
-      ],
-    }) as unknown as MatchWithTeams[];
-
+  private static mapMatches(dbData: any[]): MatchWithTeams[] {
     return dbData.map((match) => ({
       id: match.id,
       homeTeamId: match.homeTeamId,
@@ -24,5 +17,28 @@ export default class MatchesModel implements IMatchesModel {
       homeTeam: match.homeTeam,
       awayTeam: match.awayTeam,
     }));
+  }
+
+  async findAll(): Promise<MatchWithTeams[]> {
+    const dbData = await this.model.findAll({
+      include: [
+        { model: Teams, as: 'homeTeam', attributes: ['teamName'] },
+        { model: Teams, as: 'awayTeam', attributes: ['teamName'] },
+      ],
+    });
+
+    return MatchesModel.mapMatches(dbData);
+  }
+
+  async findAllBoolean(inProgress: boolean): Promise<MatchWithTeams[]> {
+    const dbData = await this.model.findAll({
+      where: { inProgress },
+      include: [
+        { model: Teams, as: 'homeTeam', attributes: ['teamName'] },
+        { model: Teams, as: 'awayTeam', attributes: ['teamName'] },
+      ],
+    });
+
+    return MatchesModel.mapMatches(dbData);
   }
 }
