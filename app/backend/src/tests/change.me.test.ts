@@ -6,14 +6,18 @@ import chaiHttp = require('chai-http');
 import { app } from '../app';
 import Example from '../database/models/ExampleModel';
 import TeamModel from '../models/Team.model';
+import MatchesModel from '../models/Matches.model'
 
 import { Response } from 'superagent';
 import teamsMocks from './mock/teams.mock';
+
+import Matches from '../database/models/MatchesModel'
 import Teams from '../database/models/TeamsModel';
 import User from '../database/models/UserModel';
 import LoginController from '../controllers/Login.controller';
 import userMock from './mock/user.mock';
 import LoginService from '../services/Login.service';
+import teamsMock from './mock/teams.mock';
 
 chai.use(chaiHttp);
 
@@ -167,3 +171,20 @@ describe('POST /login', function () {
     expect(httpResponse.body.message).to.be.equal('Invalid email or password');
   });
 });
+
+describe('MatchesModel', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('findAll deve retornar matches com teamname', async () => {
+    const findAllStub = sinon.stub(Matches, 'findAll').resolves(teamsMock.allTeams as any);
+
+    const matchesModel = new MatchesModel();
+    const result = await matchesModel.findAll();
+
+    expect(result).to.deep.equal(teamsMock.allTeams);
+    expect(findAllStub.calledOnce).to.be.true;
+  });
+});
+
