@@ -18,10 +18,13 @@ import LoginController from '../controllers/Login.controller';
 import userMock from './mock/user.mock';
 import LoginService from '../services/Login.service';
 import teamsMock from './mock/teams.mock';
+import JwtUtils, { TokenPayload } from '../utils/jwtUtils';
+import mapStatusHTTP from '../utils/mapStatusHTTP';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
+
 
 describe('Seu teste', () => {
   /**
@@ -172,7 +175,51 @@ describe('POST /login', function () {
   });
 });
 
-describe('MatchesModel', () => {
+
+describe('GET /login/role', () => {
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('deve retornar a função do usuário quando um token válido for fornecido', async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJpYXQiOjE3MTYxNzE5Njh9.reM5jsXd8mL8IZrTCeFenw4HIzKZk1m60nJ4rUDJmcY';
+    
+    const verifyStub = sinon.stub(JwtUtils, 'verify').returns({
+      email: 'admin@admin.com',
+      id: 1
+    });
+    
+    const res = await chai.request(app).get('/login/role').set('Authorization', `Bearer ${token}`);
+
+    expect(res).to.have.status(200);
+    
+    expect(res.body).to.have.property('role');
+
+    verifyStub.restore();
+  });
+
+  it('deve retornar 401 quando nenhum token for fornecido', async () => {
+    const res = await chai.request(app).get('/login/role');
+
+    expect(res).to.have.status(401);
+  });
+
+  it('should return 401 when invalid token is provided', async () => {
+    const token = 'invalid_token_here';
+    
+    const verifyStub = sinon.stub(JwtUtils, 'verify').throws(new Error('Invalid token'));
+    
+    const res = await chai.request(app).get('/login/role').set('Authorization', `Bearer ${token}`);
+
+    expect(res).to.have.status(401);
+
+    verifyStub.restore();
+  });
+});
+
+
+describe('GET /matches', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -186,5 +233,39 @@ describe('MatchesModel', () => {
     expect(result).to.deep.equal(teamsMock.allTeams);
     expect(findAllStub.calledOnce).to.be.true;
   });
+
+  it('deve retornar todas as correspondências quando nenhuma consulta for fornecida', async () => {
+    const res = await chai.request(app).get('/matches');
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+  });
+
+  it('deve retornar partidas em andamento quando query inProgress=true', async () => {
+    const res = await chai.request(app).get('/matches?inProgress=true');
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    res.body.forEach((match: any) => {
+      expect(match.inProgress).to.be.true;
+    });
+  });
+
+  it('deve retornar partidas que não estão em andamento quando query inProgress=false', async () => {
+    const res = await chai.request(app).get('/matches?inProgress=false');
+    expect(res).to.have.status(200);
+    expect(res.body).to.be.an('array');
+    res.body.forEach((match: any) => {
+      expect(match.inProgress).to.be.false;
+    });
+  });
 });
 
+describe('mapStatusHTTP', () => {
+  it('deve mapear os códigos de status corretamente', () => {
+    expect(mapStatusHTTP('SUCCESSFUL')).to.equal(200);
+    expect(mapStatusHTTP('BAD_REQUEST')).to.equal(400);
+    expect(mapStatusHTTP('INVALID_DATA')).to.equal(401);
+    expect(mapStatusHTTP('NOT_FOUND')).to.equal(404);
+    expect(mapStatusHTTP('CONFLICT')).to.equal(409);
+    expect(mapStatusHTTP('UNKNOWN_STATUS')).to.equal(500);
+  });
+});
