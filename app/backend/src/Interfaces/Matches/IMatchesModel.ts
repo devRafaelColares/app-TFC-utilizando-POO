@@ -12,5 +12,5 @@ export interface IMatchesModel {
   { homeTeamId: number,
     awayTeamId: number,
     homeTeamGoals: number,
-    awayTeamGoals: number }): Promise<IMatches>;
+    awayTeamGoals: number }): Promise<IMatches>,
 }

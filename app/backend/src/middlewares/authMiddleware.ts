@@ -22,10 +22,8 @@ class AuthMiddleware {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Salvando o usuário no objeto de solicitação para uso posterior no controlador
       (req as any).user = data;
 
-      // Passando o controle para a próxima função
       next();
     } catch (error) {
       return res.status(401).json({ message: 'Token must be a valid token' });
