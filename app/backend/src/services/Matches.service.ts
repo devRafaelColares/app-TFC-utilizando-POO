@@ -40,4 +40,14 @@ export default class MatchesService {
     }
     return { status: 'NOT_FOUND', data: { message: 'Partida não encontrada' } };
   }
+
+  public async updateMatch(id: number, updatedData:
+  { homeTeamGoals: number, awayTeamGoals: number }): Promise<ServiceResponse<ServiceMessage>> {
+    const isSuccess = await this.matchesModel.updateMatch(id, updatedData);
+
+    if (isSuccess) {
+      return { status: 'SUCCESSFUL', data: { message: 'Match updated successfully' } };
+    }
+    return { status: 'NOT_FOUND', data: { message: 'Match not found' } };
+  }
 }

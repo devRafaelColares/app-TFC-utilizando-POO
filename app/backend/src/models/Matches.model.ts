@@ -53,4 +53,20 @@ export default class MatchesModel implements IMatchesModel {
 
     return true;
   }
+
+  async updateMatch(id: number, updatedData:
+  { homeTeamGoals: number, awayTeamGoals: number }): Promise<boolean> {
+    const match = await this.model.findOne({ where: { id } });
+
+    if (!match) {
+      return false;
+    }
+
+    match.homeTeamGoals = updatedData.homeTeamGoals;
+    match.awayTeamGoals = updatedData.awayTeamGoals;
+
+    await match.save();
+
+    return true;
+  }
 }

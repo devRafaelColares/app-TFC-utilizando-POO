@@ -39,4 +39,25 @@ export default class MatchesController {
       return res.status(500).json({ message: 'Erro ao finalizar a partida' });
     }
   }
+
+  public async updateMatch(req: Request, res: Response) {
+    const { id } = req.params;
+    const { homeTeamGoals, awayTeamGoals } = req.body;
+
+    try {
+      const matchUpdated = await this.matchesService.updateMatch(Number(id), {
+        homeTeamGoals,
+        awayTeamGoals,
+      });
+
+      if (matchUpdated.status !== 'SUCCESSFUL') {
+        return res.status(mapStatusHTTP(matchUpdated.status)).json(matchUpdated.data);
+      }
+
+      return res.status(200).json({ message: 'Match updated successfully' });
+    } catch (error) {
+      console.error('Error updating match:', error);
+      return res.status(500).json({ message: 'Error updating match' });
+    }
+  }
 }
