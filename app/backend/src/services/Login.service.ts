@@ -32,4 +32,14 @@ export default class LoginService {
     const token = JwtUtils.sign({ id: user.id, email: user.email });
     return { status: 'SUCCESSFUL', data: { token } };
   }
+
+  public async getUserRole(email: string): Promise<ServiceResponse<{ role: string }>> {
+    const user = await this.userModel.findByEmail(email);
+
+    if (!user) {
+      return { status: 'NOT_FOUND', data: { message: 'User not found' } };
+    }
+
+    return { status: 'SUCCESSFUL', data: { role: user.role } };
+  }
 }

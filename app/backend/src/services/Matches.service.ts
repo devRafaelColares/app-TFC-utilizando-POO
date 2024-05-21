@@ -38,11 +38,11 @@ export default class MatchesService {
     if (isSuccess) {
       return { status: 'SUCCESSFUL', data: { message: 'Finished' } };
     }
-    return { status: 'NOT_FOUND', data: { message: 'Partida não encontrada' } };
+    return { status: 'NOT_FOUND', data: { message: 'Match not found' } };
   }
 
-  public async updateMatch(id: number, updatedData:
-  { homeTeamGoals: number, awayTeamGoals: number }): Promise<ServiceResponse<ServiceMessage>> {
+  public async updateMatch(id: number, updatedData: {
+    homeTeamGoals: number, awayTeamGoals: number }): Promise<ServiceResponse<ServiceMessage>> {
     const isSuccess = await this.matchesModel.updateMatch(id, updatedData);
 
     if (isSuccess) {
