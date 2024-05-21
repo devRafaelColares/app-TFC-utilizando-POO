@@ -205,7 +205,7 @@ describe('GET /login/role', () => {
     expect(res).to.have.status(401);
   });
 
-  it('should return 401 when invalid token is provided', async () => {
+  it('deve retornar 401 quando um token inválido for fornecido', async () => {
     const token = 'invalid_token_here';
     
     const verifyStub = sinon.stub(JwtUtils, 'verify').throws(new Error('Invalid token'));
